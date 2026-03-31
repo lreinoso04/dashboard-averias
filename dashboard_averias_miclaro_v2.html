@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard · Averías Internet Mi Claro</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #060a12;
+      --surface: #0c1322;
+      --surface2: #111b30;
+      --border: #1a2d4a;
+      --accent: #00c8f0;
+      --orange: #ff6b35;
+      --purple: #8b5cf6;
+      --green: #10b981;
+      --red: #f43f5e;
+      --yellow: #fbbf24;
+      --text: #e1e8f5;
+      --muted: #4e6785;
+      --dim: #2a3f5e;
+      --fd: 'Bebas Neue', sans-serif;
+      --fb: 'DM Sans', sans-serif;
+      --fm: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--fb);
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER ─── */
+    .header {
+      padding: 30px 44px 26px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      background: linear-gradient(160deg, rgba(0, 200, 240, 0.05) 0%, transparent 50%);
+    }
+
+    .h-eyebrow {
+      font-family: var(--fm);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .h-title {
+      font-family: var(--fd);
+      font-size: 46px;
+      letter-spacing: 2px;
+      line-height: 1;
+      color: #fff;
+    }
+
+    .h-scope {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .scope-badge {
+      background: rgba(0, 200, 240, 0.12);
+      border: 1px solid rgba(0, 200, 240, 0.25);
+      border-radius: 4px;
+      padding: 2px 10px;
+      font-family: var(--fm);
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--accent);
+    }
+
+    .h-right {
+      text-align: right;
+    }
+
+    .h-date-label {
+      font-family: var(--fm);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .h-date-val {
+      font-family: var(--fm);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--accent);
+      margin: 2px 0;
+    }
+
+    .h-months {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ─── LAYOUT ─── */
+    .main {
+      padding: 32px 44px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ─── KPI ROW ─── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+    }
+
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--kline, var(--accent));
+    }
+
+    .kpi-label {
+      font-family: var(--fm);
+      font-size: 8.5px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .kpi-val {
+      font-family: var(--fd);
+      font-size: 34px;
+      letter-spacing: 1px;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .kpi-sub {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    .kpi-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 3px;
+      margin-top: 7px;
+    }
+
+    .chip-g {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--green);
+    }
+
+    .chip-r {
+      background: rgba(244, 63, 94, 0.15);
+      color: var(--red);
+    }
+
+    .chip-y {
+      background: rgba(251, 191, 36, 0.15);
+      color: var(--yellow);
+    }
+
+    /* ─── CARDS ─── */
+    .row2 {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 20px;
+    }
+
+    .row2r {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 20px;
+    }
+
+    .row3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    .row2e {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card-title {
+      font-family: var(--fm);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2px;
+    }
+
+    .card-desc {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .card-tag {
+      font-family: var(--fm);
+      font-size: 8px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .leg {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .ld {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    /* ─── MONTH TABLE ─── */
+    .mtable {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .mtable th {
+      font-family: var(--fm);
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+      padding: 0 10px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mtable td {
+      padding: 9px 10px;
+      font-size: 11.5px;
+      color: #a8bdd8;
+      border-bottom: 1px solid rgba(26, 45, 74, 0.5);
+    }
+
+    .mtable tr:last-child td {
+      border-bottom: none;
+    }
+
+    .mn {
+      font-weight: 600;
+      color: #fff;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .mono {
+      font-family: var(--fm);
+      font-size: 11px;
+    }
+
+    .bar-bg {
+      background: var(--surface2);
+      border-radius: 2px;
+      height: 8px;
+      overflow: hidden;
+      width: 70px;
+      flex-shrink: 0;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 2px;
+    }
+
+    .td-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .fg {
+      color: var(--green);
+    }
+
+    .fy {
+      color: var(--yellow);
+    }
+
+    .fr {
+      color: var(--red);
+    }
+
+    /* ─── INSIGHT ─── */
+    .insight {
+      background: linear-gradient(135deg, rgba(0, 200, 240, 0.07) 0%, rgba(139, 92, 246, 0.07) 100%);
+      border: 1px solid rgba(0, 200, 240, 0.18);
+      border-radius: 12px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .ins-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .ins-label {
+      font-family: var(--fm);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 5px;
+    }
+
+    .ins-text {
+      font-size: 12.5px;
+      color: #8daac8;
+      line-height: 1.6;
+    }
+
+    .ins-text strong {
+      color: #fff;
+    }
+
+    /* ─── ANALYSIS (PROS / CONS) ─── */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 4px 0;
+    }
+
+    .sec-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .sec-label {
+      font-family: var(--fm);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 4px;
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .a-card {
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .a-card-pro {
+      background: rgba(16, 185, 129, 0.05);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .a-card-con {
+      background: rgba(244, 63, 94, 0.05);
+      border: 1px solid rgba(244, 63, 94, 0.2);
+    }
+
+    .a-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .a-ico {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .ico-p {
+      background: rgba(16, 185, 129, 0.15);
+    }
+
+    .ico-c {
+      background: rgba(244, 63, 94, 0.15);
+    }
+
+    .a-title {
+      font-family: var(--fd);
+      font-size: 26px;
+      letter-spacing: 1px;
+    }
+
+    .t-pro {
+      color: var(--green);
+    }
+
+    .t-con {
+      color: var(--red);
+    }
+
+    .a-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(26, 45, 74, 0.7);
+    }
+
+    .a-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .a-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+
+    .dp {
+      background: var(--green);
+      box-shadow: 0 0 5px var(--green);
+    }
+
+    .dc {
+      background: var(--red);
+      box-shadow: 0 0 5px var(--red);
+    }
+
+    .a-text {
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: #8daac8;
+    }
+
+    .a-text strong {
+      color: #e1e8f5;
+      font-weight: 600;
+    }
+
+    /* ─── FUTURE ACTIONS ─── */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .action-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .action-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--al, var(--accent));
+    }
+
+    .action-num {
+      font-family: var(--fm);
+      font-size: 10px;
+      color: var(--al, var(--accent));
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .action-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .action-body {
+      font-size: 12px;
+      color: #7a9abc;
+      line-height: 1.65;
+    }
+
+    .action-body strong {
+      color: #a8bdd8;
+    }
+
+    .action-tag {
+      display: inline-flex;
+      margin-top: 12px;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-family: var(--fm);
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .tag-urgent {
+      background: rgba(244, 63, 94, 0.12);
+      color: var(--red);
+      border: 1px solid rgba(244, 63, 94, 0.2);
+    }
+
+    .tag-mid {
+      background: rgba(251, 191, 36, 0.12);
+      color: var(--yellow);
+      border: 1px solid rgba(251, 191, 36, 0.2);
+    }
+
+    .tag-plan {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    /* ─── ANOMALY ─── */
+    .alert-card {
+      background: rgba(251, 191, 36, 0.05);
+      border: 1px solid rgba(251, 191, 36, 0.22);
+      border-radius: 12px;
+      padding: 18px 22px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .alert-ico {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .alert-label {
+      font-family: var(--fm);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 6px;
+    }
+
+    .alert-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .alert-item {
+      font-size: 11.5px;
+      color: #8daac8;
+      display: flex;
+      gap: 8px;
+    }
+
+    .alert-item span {
+      color: var(--yellow);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      padding: 18px 44px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .f-note {
+      font-family: var(--fm);
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    .f-logo {
+      font-family: var(--fd);
+      font-size: 20px;
+      letter-spacing: 3px;
+      color: var(--accent);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <div class="h-eyebrow">▸ Análisis Operacional · Canal Digital Self-Service</div>
+      <div class="h-title">Averías Internet Mi Claro</div>
+      <div class="h-scope">
+        <span class="scope-badge">OCT 2025 – MAR 2026</span>
+        <span>6 meses · 173 días operativos · Fix Automático + Paso a Paso activos</span>
+      </div>
+    </div>
+    <div class="h-right">
+      <div class="h-date-label">Actualizado al</div>
+      <div class="h-date-val">30·03·2026</div>
+      <div class="h-months">Período analizado: 6 meses completos</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi" style="--kline:var(--accent)">
+        <div class="kpi-label">Usuarios con Intención</div>
+        <div class="kpi-val">56,470</div>
+        <div class="kpi-sub">Total Oct 25 – Mar 26</div>
+        <div class="kpi-chip chip-g">▲ Pico: 11,778 Mar 26</div>
+      </div>
+      <div class="kpi" style="--kline:var(--orange)">
+        <div class="kpi-label">Tickets Generados</div>
+        <div class="kpi-val">24,723</div>
+        <div class="kpi-sub">43.8% del total de usuarios</div>
+        <div class="kpi-chip chip-r">▼ Baja a 30.3% en Mar 26</div>
+      </div>
+      <div class="kpi" style="--kline:var(--accent))">
+        <div class="kpi-label">Fix Automático</div>
+        <div class="kpi-val">18,041</div>
+        <div class="kpi-sub">Resoluciones sin agente</div>
+        <div class="kpi-chip chip-g">▲ +637% Oct→Mar</div>
+      </div>
+      <div class="kpi" style="--kline:var(--purple)">
+        <div class="kpi-label">Paso a Paso</div>
+        <div class="kpi-val">14,476</div>
+        <div class="kpi-sub">Guía interactiva app</div>
+        <div class="kpi-chip chip-r">▼ Cede paso al Fix</div>
+      </div>
+      <div class="kpi" style="--kline:var(--green)">
+        <div class="kpi-label">Total Casos Resueltos</div>
+        <div class="kpi-val">32,517</div>
+        <div class="kpi-sub">Fix + Paso a Paso</div>
+        <div class="kpi-chip chip-g">▲ Sin ticket de soporte</div>
+      </div>
+      <div class="kpi" style="--kline:var(--yellow)">
+        <div class="kpi-label">FCP Promedio</div>
+        <div class="kpi-val">55.4%</div>
+        <div class="kpi-sub">Solución Primer Contacto</div>
+        <div class="kpi-chip chip-g">▲ 62.4%→69.7% Oct→Mar</div>
+      </div>
+    </div>
+
+    <!-- INSIGHT -->
+    <div class="insight">
+      <div class="ins-icon">💡</div>
+      <div>
+        <div class="ins-label">Hallazgo Principal del Período</div>
+        <div class="ins-text">
+          El período muestra una <strong>transformación del modelo de resolución</strong>: en Octubre 2025, el Paso a
+          Paso resolvía el 83.3% de los casos mientras el Fix apenas el 16.7%. En Marzo 2026 esa proporción se
+          <strong>invirtió radicalmente: Fix 80.5% vs Paso a Paso 19.5%</strong>. Este cambio estructural reduce costos
+          operativos y mejora la experiencia del usuario. Sin embargo, <strong>Febrero 2026 rompe la tendencia</strong>
+          con el peor FCP del período (44.3%), indicando vulnerabilidad operativa que debe ser investigada.
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 1: Tendencia + FCP -->
+    <div class="row2">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Volumen Mensual</div>
+            <div class="card-desc">Usuarios, Tickets y Casos Resueltos</div>
+          </div>
+          <span class="card-tag">Oct 25 – Mar 26</span>
+        </div>
+        <div class="legend">
+          <div class="leg">
+            <div class="ld" style="background:var(--accent)"></div>Usuarios
+          </div>
+          <div class="leg">
+            <div class="ld" style="background:var(--orange)"></div>Tickets
+          </div>
+          <div class="leg">
+            <div class="ld" style="background:var(--green)"></div>Resueltos
+          </div>
+        </div>
+        <canvas id="trendChart" height="200"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">KPI Principal</div>
+            <div class="card-desc">% FCP vs % Generan Ticket</div>
+          </div>
+          <span class="card-tag">Por mes</span>
+        </div>
+        <div class="legend">
+          <div class="leg">
+            <div class="ld" style="background:var(--green)"></div>% FCP
+          </div>
+          <div class="leg">
+            <div class="ld" style="background:var(--red)"></div>% Genera Ticket
+          </div>
+        </div>
+        <canvas id="fcpChart" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- ROW 2: Métodos + Tabla -->
+    <div class="row2r">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Resumen Mensual</div>
+            <div class="card-desc">Todos los indicadores importantes</div>
+          </div>
+          <span class="card-tag">Tabla</span>
+        </div>
+        <table class="mtable">
+          <thead>
+            <tr>
+              <th>Mes</th>
+              <th>Usuarios</th>
+              <th>Tickets</th>
+              <th>Fix</th>
+              <th>Paso a Paso</th>
+              <th>FCP %</th>
+            </tr>
+          </thead>
+          <tbody id="tBody"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Método de Resolución</div>
+            <div class="card-desc">Fix Automático vs Paso a Paso (Apilado)</div>
+          </div>
+          <span class="card-tag">Barras</span>
+        </div>
+        <div class="legend">
+          <div class="leg">
+            <div class="ld" style="background:var(--accent)"></div>Fix Automático
+          </div>
+          <div class="leg">
+            <div class="ld" style="background:var(--purple)"></div>Paso a Paso
+          </div>
+        </div>
+        <canvas id="methodChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- ROW 3: Donut + Fix% + Scatter -->
+    <div class="row3">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Composición Total</div>
+            <div class="card-desc">Mix de resoluciones</div>
+          </div>
+          <span class="card-tag">Donut</span>
+        </div>
+        <div style="display:flex;justify-content:center;align-items:center;flex:1;">
+          <canvas id="donutChart" height="210" style="max-width:260px"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Evolución Fix %</div>
+            <div class="card-desc">% Fix sobre total resuelto</div>
+          </div>
+          <span class="card-tag">Tendencia</span>
+        </div>
+        <canvas id="fixPctChart" height="210"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">FCP por Mes</div>
+            <div class="card-desc">Umbral 60% = meta operativa</div>
+          </div>
+          <span class="card-tag">Radar</span>
+        </div>
+        <canvas id="radarChart" height="210"></canvas>
+      </div>
+    </div>
+
+    <!-- ANOMALY -->
+    <div class="alert-card">
+      <div class="alert-ico">🔍</div>
+      <div style="width:100%">
+        <div class="alert-label">Alertas de Calidad de Datos &amp; Anomalías Detectadas</div>
+        <div class="alert-list">
+          <div class="alert-item"><span>A1</span> <strong>9-Nov-2025:</strong> todos los registros en cero (tickets,
+            resoluciones, usuarios). Probable caída del sistema o error de captura — requiere validación con TI.</div>
+          <div class="alert-item"><span>A2</span> <strong>20-Nov-2025 spike:</strong> 615 tickets en un solo día, el
+            máximo absoluto del período (≈3× el promedio diario). Posible incidente masivo de red sin documentar.</div>
+          <div class="alert-item"><span>A3</span> <strong>Febrero 2026:</strong> FCP cae al 44.3%, el peor mes del
+            período activo. Fix aporta solo 21.3% — ruptura de tendencia que requiere análisis de causa raíz.</div>
+          <div class="alert-item"><span>A4</span> <strong>Octubre 2025 (primeras 2 semanas):</strong> Fix Automático
+            reporta valores muy bajos (12–30% del total), posible período de rodaje o activación gradual del motor.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── PROS Y CONTRAS ─── -->
+    <div class="section-divider">
+      <div class="sec-line"></div>
+      <div class="sec-label">Evaluación Operacional</div>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="analysis-grid">
+      <!-- PROS -->
+      <div class="a-card a-card-pro">
+        <div class="a-head">
+          <div class="a-ico ico-p">✅</div>
+          <div class="a-title t-pro">FORTALEZAS DEL CANAL</div>
+        </div>
+        <div class="a-item">
+          <div class="a-dot dp"></div>
+          <div class="a-text"><strong>Fix Automático como motor de eficiencia:</strong> Pasó de resolver 3,875 casos en
+            Oct 2025 a 6,602 en Mar 2026 (+70.4%). El autodiagnóstico está madurando y asumiendo la carga principal del
+            canal digital.</div>
+        </div>
+        <div class="a-item">
+          <div class="a-dot dp"></div>
+          <div class="a-text"><strong>FCP en máximo histórico (Mar 2026):</strong> 69.7% de los usuarios resuelven su
+            avería en el primer contacto con la app, sin necesidad de hablar con un agente. Un indicador de experiencia
+            de clase alta en canales de autoservicio.</div>
+        </div>
+        <div class="a-item">
+          <div class="a-dot dp"></div>
+          <div class="a-text"><strong>Reducción estructural de tickets:</strong> La tasa de generación de ticket bajó
+            del 37.6% (Oct) al 30.3% (Mar). Cada punto representa cientos de casos que ya no llegan al soporte humano,
+            con impacto directo en costos.</div>
+        </div>
+        <div class="a-item">
+          <div class="a-dot dp"></div>
+          <div class="a-text"><strong>Mayor adopción del canal:</strong> Los usuarios que intentan reportar averías
+            desde Mi Claro crecieron de 11,489 (Oct) a 11,778 (Mar). El canal digital se consolida como primera línea de
+            atención.</div>
+        </div>
+        <div class="a-item">
+          <div class="a-dot dp"></div>
+          <div class="a-text"><strong>32,517 casos resueltos sin agente:</strong> Cada resolución digital es un caso que
+            no entra al Equipo de diagnóstico. Asumiendo un costo promedio por llamada, esto representa un ahorro
+            operativo significativo en el semestre.</div>
+        </div>
+      </div>
+
+      <!-- CONS -->
+      <div class="a-card a-card-con">
+        <div class="a-head">
+          <div class="a-ico ico-c">⚠️</div>
+          <div class="a-title t-con">ÁREAS DE RIESGO</div>
+        </div>
+        <div class="a-item">
+          <div class="a-dot dc"></div>
+          <div class="a-text"><strong>Inestabilidad del FCP mes a mes:</strong> La curva no es lineal — cae de 62.4%
+            (Oct) a 49.9% (Nov), repunta a 58.6% (Ene) y desploma a 44.3% (Feb). Sin raíz documentada, estas caídas son
+            impredecibles.</div>
+        </div>
+        <div class="a-item">
+          <div class="a-dot dc"></div>
+          <div class="a-text"><strong>Febrero 2026, mes crítico:</strong> Con FCP de 44.3% y Fix en solo 21.3%, el canal
+            tuvo su peor rendimiento del período activo. La coincidencia con baja en resoluciones sugiere un problema en
+            el motor de autodiagnóstico o un spike atípico de averías no captado en el dataset.</div>
+        </div>
+        <div class="a-item">
+          <div class="a-dot dc"></div>
+          <div class="a-text"><strong>Dependencia del Fix sin backup claro:</strong> Con el Fix dominando el 80.5% en
+            Mar 2026, cualquier degradación del motor automatizado impacta directamente el FCP y eleva presión al Equipo
+            de diagnóstico sin mecanismo de amortiguación.</div>
+        </div>
+        <div class="a-item">
+          <div class="a-dot dc"></div>
+          <div class="a-text"><strong>Sin tipología de avería:</strong> El dataset no clasifica por tipo de falla (corte
+            total, lentitud, intermitencia). Imposible saber qué tipos resuelve mejor el Fix, qué requiere Paso a Paso y
+            qué inevitablemente genera ticket.</div>
+        </div>
+        <div class="a-item">
+          <div class="a-dot dc"></div>
+          <div class="a-text"><strong>Calidad de datos con gaps:</strong> Registro del 9-Nov en cero, spike no explicado
+            del 20-Nov, y activación gradual del Fix en Oct sugieren que el pipeline de datos no tiene validaciones
+            automáticas robustas.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── ACCIONES A FUTURO ─── -->
+    <div class="section-divider">
+      <div class="sec-line"></div>
+      <div class="sec-label">Plan de Acción</div>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="actions-grid">
+      <div class="action-card" style="--al:var(--red)">
+        <div class="action-num">ACCIÓN 01 · INMEDIATA</div>
+        <div class="action-title">Investigar caída de Febrero 2026</div>
+        <div class="action-body">Realizar un análisis de causa raíz del mes con peor FCP del período. Revisar
+          <strong>logs del motor Fix</strong>, volumen de averías masivas no documentadas y tasas de abandono en el
+          flujo de la app. Comparar con datos del Equipo de Diagnóstico del mismo período.
+        </div>
+        <span class="action-tag tag-urgent">🔴 Urgente</span>
+      </div>
+      <div class="action-card" style="--al:var(--red)">
+        <div class="action-num">ACCIÓN 02 · INMEDIATA</div>
+        <div class="action-title">Validar y limpiar pipeline de datos</div>
+        <div class="action-body">Implementar <strong>validaciones automáticas</strong> en el pipeline: alertas cuando un
+          día registre 0 en todos los campos, detección de spikes superiores a 2× la media móvil de 7 días, y
+          reconciliación automática con fuentes primarias (SACS).</div>
+        <span class="action-tag tag-urgent">🔴 Urgente</span>
+      </div>
+      <div class="action-card" style="--al:var(--yellow)">
+        <div class="action-num">ACCIÓN 03 · CORTO PLAZO</div>
+        <div class="action-title">Agregar tipología de avería al dataset</div>
+        <div class="action-body">Enriquecer el reporte con la <strong>clasificación de la avería</strong> (corte total,
+          lentitud, intermitencia, DNS, etc.) para identificar qué fallas resuelve bien el Fix y cuáles inevitablemente
+          generan ticket. Permitirá priorizar mejoras del motor.</div>
+        <span class="action-tag tag-mid">🟡 30 días</span>
+      </div>
+      <div class="action-card" style="--al:var(--yellow)">
+        <div class="action-num">ACCIÓN 04 · CORTO PLAZO</div>
+        <div class="action-title">Plan de contingencia para degradación del Fix</div>
+        <div class="action-body">Definir un <strong>protocolo de respaldo automático</strong>: si el Fix baja del 40% de
+          resoluciones diarias, activar rutas alternativas (escalado a Paso a Paso, chat asistido, notificación
+          proactiva). El Fix domina el 80%+ y no tiene red de seguridad.</div>
+        <span class="action-tag tag-mid">🟡 45 días</span>
+      </div>
+      <div class="action-card" style="--al:var(--green)">
+        <div class="action-num">ACCIÓN 05 · MEDIANO PLAZO</div>
+        <div class="action-title">Meta FCP 75% para Q3 2026</div>
+        <div class="action-body">Con Marzo en 69.7%, la meta del <strong>75% de FCP es alcanzable</strong> en 3–4 meses.
+          Para lograrlo: refinar los árboles de diagnóstico del Fix, mejorar el Paso a Paso para fallas que el motor no
+          resuelve, y reducir la tasa de abandono del flujo en app.</div>
+        <span class="action-tag tag-plan">🟢 90 días</span>
+      </div>
+      <div class="action-card" style="--al:var(--green)">
+        <div class="action-num">ACCIÓN 06 · MEDIANO PLAZO</div>
+        <div class="action-title">Dashboard en tiempo real + alertas</div>
+        <div class="action-body">Pasar del análisis mensual retrospectivo a un <strong>monitoreo diario
+            operativo</strong>: dashboard live con KPIs del día, alertas automáticas por email/Slack si el FCP cae bajo
+          el 55%, y reporte semanal automatizado para gerencia. Evita sorpresas como Febrero 2026.</div>
+        <span class="action-tag tag-plan">🟢 90 días</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="f-note">FUENTE: Analisis_Averias_Mi_Claro_30_marzo_2026.xlsx &nbsp;·&nbsp; ALCANCE: Oct 2025 – Mar 2026
+      &nbsp;·&nbsp; 173 días operativos · Fix + Paso a Paso activos</div>
+    <div class="f-logo">MI CLARO · ANÁLISIS</div>
+  </div>
+
+  <script>
+    // DATA Oct–Mar
+    const months = ['Oct 25', 'Nov 25', 'Dic 25', 'Ene 26', 'Feb 26', 'Mar 26'];
+    const usuarios = [11489, 9973, 6906, 10325, 6749, 11778];
+    const tickets = [4319, 4996, 3794, 4278, 3762, 3574];
+    const fix = [3875, 1737, 899, 3489, 1439, 6602];
+    const pap = [3295, 3240, 2213, 2558, 1548, 1602];
+    const resueltos = fix.map((f, i) => f + pap[i]);
+    const fcp = [62.4, 49.9, 45.1, 58.6, 44.3, 69.7];
+    const pctTkt = [37.6, 50.1, 54.9, 41.4, 55.7, 30.3];
+    const fixPct = fix.map((f, i) => resueltos[i] > 0 ? +((f / resueltos[i]) * 100).toFixed(1) : 0);
+
+    Chart.defaults.color = '#4e6785';
+    Chart.defaults.font.family = "'DM Sans', sans-serif";
+    Chart.defaults.font.size = 11;
+    const grid = { color: 'rgba(26,45,74,0.7)', drawBorder: false };
+    const ticks = { color: '#4e6785', maxRotation: 0 };
+
+    // 1. TREND
+    new Chart(document.getElementById('trendChart'), {
+      type: 'line',
+      data: {
+        labels: months, datasets: [
+          { label: 'Usuarios', data: usuarios, borderColor: '#00c8f0', backgroundColor: 'rgba(0,200,240,0.06)', fill: true, tension: 0.4, pointRadius: 4, borderWidth: 2 },
+          { label: 'Tickets', data: tickets, borderColor: '#ff6b35', backgroundColor: 'rgba(255,107,53,0.06)', fill: true, tension: 0.4, pointRadius: 4, borderWidth: 2 },
+          { label: 'Resueltos', data: resueltos, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.06)', fill: true, tension: 0.4, pointRadius: 4, borderWidth: 2 }
+        ]
+      },
+      options: {
+        responsive: true, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false } },
+        scales: { x: { grid, ticks }, y: { grid, ticks: { ...ticks, callback: v => v.toLocaleString('es-DO') } } }
+      }
+    });
+
+    // 2. FCP
+    new Chart(document.getElementById('fcpChart'), {
+      type: 'bar',
+      data: {
+        labels: months, datasets: [
+          {
+            label: '% FCP', data: fcp,
+            backgroundColor: fcp.map(v => v >= 60 ? 'rgba(16,185,129,0.7)' : v >= 50 ? 'rgba(251,191,36,0.7)' : 'rgba(244,63,94,0.7)'),
+            borderColor: fcp.map(v => v >= 60 ? '#10b981' : v >= 50 ? '#fbbf24' : '#f43f5e'),
+            borderWidth: 1, borderRadius: 4, borderSkipped: false, order: 2
+          },
+          {
+            label: '% Ticket', data: pctTkt, type: 'line', borderColor: '#f43f5e', backgroundColor: 'transparent',
+            tension: 0.4, pointRadius: 4, borderWidth: 2, borderDash: [5, 3], order: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false } },
+        scales: { x: { grid, ticks }, y: { grid, ticks: { ...ticks, callback: v => v + '%' }, min: 25, max: 80 } }
+      }
+    });
+
+    // 3. METHOD STACKED
+    new Chart(document.getElementById('methodChart'), {
+      type: 'bar',
+      data: {
+        labels: months, datasets: [
+          { label: 'Fix Automático', data: fix, backgroundColor: 'rgba(0,200,240,0.75)', borderColor: '#00c8f0', borderWidth: 1, borderRadius: 4, borderSkipped: false },
+          { label: 'Paso a Paso', data: pap, backgroundColor: 'rgba(139,92,246,0.65)', borderColor: '#8b5cf6', borderWidth: 1, borderRadius: 4, borderSkipped: false }
+        ]
+      },
+      options: {
+        responsive: true, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false } },
+        scales: {
+          x: { grid, ticks, stacked: true },
+          y: { grid, stacked: true, ticks: { ...ticks, callback: v => v.toLocaleString('es-DO') } }
+        }
+      }
+    });
+
+    // 4. DONUT
+    const totalFix = fix.reduce((a, b) => a + b, 0);
+    const totalPap = pap.reduce((a, b) => a + b, 0);
+    const totalTkt = tickets.reduce((a, b) => a + b, 0);
+    new Chart(document.getElementById('donutChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Fix Automático', 'Paso a Paso', 'Generaron Ticket'],
+        datasets: [{
+          data: [totalFix, totalPap, totalTkt],
+          backgroundColor: ['rgba(0,200,240,0.8)', 'rgba(139,92,246,0.8)', 'rgba(255,107,53,0.6)'],
+          borderColor: ['#00c8f0', '#8b5cf6', '#ff6b35'], borderWidth: 2, hoverOffset: 8
+        }]
+      },
+      options: {
+        responsive: true, cutout: '65%',
+        plugins: {
+          legend: { position: 'bottom', labels: { padding: 10, boxWidth: 11, color: '#4e6785', font: { size: 10 } } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed.toLocaleString('es-DO')}` } }
+        }
+      }
+    });
+
+    // 5. FIX PCT LINE
+    new Chart(document.getElementById('fixPctChart'), {
+      type: 'line',
+      data: {
+        labels: months, datasets: [{
+          label: '% Fix del Total Resuelto', data: fixPct,
+          borderColor: '#00c8f0',
+          backgroundColor: (ctx) => {
+            const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 200);
+            g.addColorStop(0, 'rgba(0,200,240,0.3)'); g.addColorStop(1, 'rgba(0,200,240,0.01)'); return g;
+          },
+          fill: true, tension: 0.4, pointRadius: 5, borderWidth: 2.5,
+          pointBackgroundColor: fixPct.map(v => v >= 60 ? '#10b981' : v >= 30 ? '#fbbf24' : '#f43f5e'),
+          pointBorderColor: '#060a12', pointBorderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true, plugins: { legend: { display: false } },
+        scales: { x: { grid, ticks }, y: { grid, ticks: { ...ticks, callback: v => v + '%' }, min: 0, max: 90 } }
+      }
+    });
+
+    // 6. RADAR
+    new Chart(document.getElementById('radarChart'), {
+      type: 'radar',
+      data: {
+        labels: months, datasets: [
+          { label: '% FCP', data: fcp, borderColor: '#00c8f0', backgroundColor: 'rgba(0,200,240,0.12)', pointBackgroundColor: '#00c8f0', borderWidth: 2 },
+          { label: 'Meta 60%', data: [60, 60, 60, 60, 60, 60], borderColor: 'rgba(16,185,129,0.4)', backgroundColor: 'transparent', borderDash: [5, 3], borderWidth: 1.5, pointRadius: 0 }
+        ]
+      },
+      options: {
+        responsive: true, plugins: { legend: { display: false } },
+        scales: { r: { grid: { color: 'rgba(26,45,74,0.7)' }, ticks: { color: '#4e6785', backdropColor: 'transparent', font: { size: 9 } }, pointLabels: { color: '#4e6785', font: { size: 10 } }, min: 30, max: 80 } }
+      }
+    });
+
+    // TABLE
+    const tbody = document.getElementById('tBody');
+    const fullM = ['Octubre 2025', 'Noviembre 2025', 'Diciembre 2025', 'Enero 2026', 'Febrero 2026', 'Marzo 2026'];
+    fullM.forEach((m, i) => {
+      const fv = fcp[i];
+      const cls = fv >= 60 ? 'fg' : fv >= 50 ? 'fy' : 'fr';
+      const bw = Math.round((fv / 80) * 100);
+      const bc = fv >= 60 ? '#10b981' : fv >= 50 ? '#fbbf24' : '#f43f5e';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+    <td class="mn">${m}</td>
+    <td class="mono">${usuarios[i].toLocaleString('es-DO')}</td>
+    <td class="mono">${tickets[i].toLocaleString('es-DO')}</td>
+    <td class="mono" style="color:#00c8f0">${fix[i].toLocaleString('es-DO')}</td>
+    <td class="mono" style="color:#8b5cf6">${pap[i].toLocaleString('es-DO')}</td>
+    <td>
+      <div class="td-bar">
+        <div class="bar-bg"><div class="bar-fill" style="width:${bw}%;background:${bc}"></div></div>
+        <span class="mono ${cls}">${fv}%</span>
+      </div>
+    </td>`;
+      tbody.appendChild(tr);
+    });
+  </script>
+</body>
+
+</html>
